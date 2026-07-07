@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Simulación interactiva del Sistema Solar instalable como PWA para iPhone y Android.">
+  <meta name="theme-color" content="#070b14">
+  <meta name="background-color" content="#070b14">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Sistema Solar">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>Sistema Solar PRO</title>
+
+  manifest.json
+  assets/icons/icon-180.png
+  assets/icons/icon-192.png
+  assets/icons/icon-512.png
+
+  <style>
+    :root{
+      --bg:#070b14;
+      --bg2:#0b1220;
+      --panel:#0f172a;
+      --panel2:#111c31;
+      --card:#0c1423;
+      --txt:#e5e7eb;
+      --sub:#9ca3af;
+      --muted:#64748b;
+      --border:#243043;
+      --accent:#22c55e;
+      --accent2:#38bdf8;
+      --danger:#fb7185;
+      --warning:#f59e0b;
+      --orbit:#334155;
+      --shadow:0 18px 60px rgba(0,0,0,.35);
+      --radius:18px;
+      --header-h:76px;
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,
+    body{
+      width:100%;
+      height:100%;
+      min-height:100%;
+      margin:0;
+      overflow:hidden;
+      background:var(--bg);
+      color:var(--txt);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      touch-action:manipulation;
+    }
+
+    body{
+      display:flex;
+      flex-direction:column;
+      background:
+        radial-gradient(1200px 780px at 50% -220px, rgba(56,189,248,.18), transparent 65%),
+        radial-gradient(900px 650px at 80% 12%, rgba(34,197,94,.10), transparent 60%),
+        linear-gradient(180deg,#070b14,#0b1220 58%,#05070d);
+    }
+
+    button,
+    input,
+    select{
+      font:inherit;
+    }
+
+    button{
+      border:1px solid var(--border);
+      background:#0f1829;
+      color:var(--txt);
+      border-radius:14px;
+      padding:10px 13px;
+      cursor:pointer;
+      min-height:42px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      user-select:none;
+      transition:transform .15s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
+    }
+
+    button:active{
+      transform:scale(.97);
+    }
+
+    button:hover{
+      border-color:#3b4a63;
+      background:#142038;
+    }
+
+    button.brand{
+      background:linear-gradient(135deg,#22c55e,#38bdf8);
+      color:#02131a;
+      border-color:transparent;
+      font-weight:800;
+    }
+
+    button.warning{
+      background:rgba(245,158,11,.14);
+      border-color:rgba(245,158,11,.38);
+      color:#fde68a;
+    }
+
+    button.ghost{
+      background:rgba(15,24,41,.55);
+    }
+
+    button.small{
+      min-height:36px;
+      padding:8px 10px;
+      border-radius:12px;
+      font-size:13px;
+    }
+
+    button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    select{
+      min-height:42px;
+      border:1px solid var(--border);
+      background:#0f1829;
+      color:var(--txt);
+      border-radius:14px;
+      padding:9px 12px;
+      outline:none;
+    }
+
+    input[type="range"]{
+      accent-color:var(--accent2);
+      width:180px;
+      max-width:100%;
+    }
+
+    header{
+      min-height:var(--header-h);
+      padding:10px max(14px, env(safe-area-inset-left)) 10px max(14px, env(safe-area-inset-left));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(148,163,184,.16);
+      background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(15,23,42,.76));
+      backdrop-filter:blur(14px);
+      z-index:50;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+    }
+
+    .brand-title{
+      display:flex;
+      align-items:center;
+      gap:11px;
+      min-width:0;
+    }
+
+    .app-icon{
+      width:44px;
+      height:44px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 50% 50%, #fbbf24 0 17%, transparent 18%),
+        radial-gradient(circle at 45% 48%, rgba(56,189,248,.85) 0 6%, transparent 7%),
+        radial-gradient(circle at 60% 62%, rgba(34,197,94,.9) 0 5%, transparent 6%),
+        linear-gradient(135deg,#0f172a,#020617);
+      border:1px solid rgba(148,163,184,.25);
+      box-shadow:0 12px 30px rgba(0,0,0,.3);
+      flex:0 0 auto;
+    }
+
+    .title-wrap{
+      min-width:0;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(16px,2.2vw,21px);
+      line-height:1.16;
+      font-weight:850;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .sub{
+      color:var(--sub);
+      font-size:12px;
+      line-height:1.3;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .workspace{
+      position:relative;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      background:#05070d;
+    }
+
+    .top-panel{
+      position:absolute;
+      top:14px;
+      left:14px;
+      right:14px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      z-index:20;
+      pointer-events:none;
+    }
+
+    .controls{
+      pointer-events:auto;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      border:1px solid rgba(148,163,184,.18);
+      background:rgba(12,20,35,.82);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+      max-width:980px;
+    }
+
+    .control-group{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      padding:4px 6px;
+      border-radius:14px;
+    }
+
+    .control-label{
+      color:var(--sub);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:28px;
+      padding:4px 9px;
+      border-radius:999px;
+      color:#cbd5e1;
+      border:1px solid rgba(148,163,184,.17);
+      background:#0e1728;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      color:var(--sub);
+      font-size:13px;
+      min-height:34px;
+      padding:2px 4px;
+      cursor:pointer;
+    }
+
+    .toggle input{
+      width:18px;
+      height:18px;
+      accent-color:var(--accent);
+    }
+
+    .planet-card{
+      position:absolute;
+      right:14px;
+      bottom:14px;
+      width:min(370px, calc(100% - 28px));
+      z-index:35;
+      padding:14px;
+      border:1px solid rgba(148,163,184,.18);
+      background:rgba(12,20,35,.88);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .planet-card header{
+      min-height:auto;
+      padding:0;
+      border:0;
+      background:transparent;
+      box-shadow:none;
+      backdrop-filter:none;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .planet-name{
+      margin:0;
+      font-size:18px;
+      line-height:1.1;
+      font-weight:850;
+    }
+
+    .planet-desc{
+      margin-top:4px;
+      color:var(--sub);
+      font-size:12px;
+    }
+
+    .planet-dot{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      flex:0 0 auto;
+      border:1px solid rgba(255,255,255,.25);
+      box-shadow:0 0 22px currentColor;
+    }
+
+    .data-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .metric{
+      padding:10px;
+      border-radius:15px;
+      background:rgba(15,24,41,.72);
+      border:1px solid rgba(148,163,184,.12);
+    }
+
+    .metric span{
+      display:block;
+      color:var(--sub);
+      font-size:11px;
+      margin-bottom:2px;
+    }
+
+    .metric strong{
+      display:block;
+      font-size:13px;
+      line-height:1.18;
+      color:#f8fafc;
+      overflow-wrap:anywhere;
+    }
+
+    .hint{
+      margin-top:10px;
+      color:var(--sub);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .bottom-note{
+      position:absolute;
+      left:14px;
+      bottom:14px;
+      z-index:25;
+      max-width:min(560px, calc(100% - 420px));
+      padding:10px 12px;
+      border-radius:15px;
+      background:rgba(12,20,35,.78);
+      border:1px solid rgba(148,163,184,.16);
+      color:var(--sub);
+      font-size:12px;
+      line-height:1.35;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    .install-banner{
+      position:absolute;
+      left:14px;
+      top:100px;
+      z-index:45;
+      width:min(390px, calc(100% - 28px));
+      border:1px solid rgba(56,189,248,.25);
+      background:rgba(8,20,36,.94);
+      border-radius:20px;
+      padding:12px;
+      box-shadow:var(--shadow);
+      display:none;
+    }
+
+    .install-banner.show{
+      display:block;
+    }
+
+    .install-banner h2{
+      margin:0 0 4px;
+      font-size:15px;
+    }
+
+    .install-banner p{
+      margin:0 0 10px;
+      color:var(--sub);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .install-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .toast{
+      position:absolute;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%) translateY(20px);
+      z-index:80;
+      padding:10px 13px;
+      border-radius:999px;
+      background:rgba(15,24,41,.95);
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,.2);
+      box-shadow:var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+      font-size:13px;
+      max-width:calc(100% - 28px);
+      text-align:center;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    .desktop-only{
+      display:inline-flex;
+    }
+
+    .mobile-only{
+      display:none;
+    }
+
+    @media (max-width:980px){
+      :root{
+        --header-h:72px;
+      }
+
+      header{
+        align-items:flex-start;
+      }
+
+      .header-actions{
+        display:none;
+      }
+
+      .top-panel{
+        top:10px;
+        left:10px;
+        right:10px;
+        grid-template-columns:1fr;
+      }
+
+      .controls{
+        max-height:172px;
+        overflow:auto;
+        align-content:flex-start;
+      }
+
+      .desktop-only{
+        display:none;
+      }
+
+      .mobile-only{
+        display:inline-flex;
+      }
+
+      .planet-card{
+        left:10px;
+        right:10px;
+        bottom:max(10px, env(safe-area-inset-bottom));
+        width:auto;
+        padding:12px;
+        border-radius:20px;
+      }
+
+      .data-grid{
+        grid-template-columns:1fr 1fr;
+        gap:7px;
+      }
+
+      .metric{
+        padding:8px;
+      }
+
+      .bottom-note{
+        display:none;
+      }
+
+      .install-banner{
+        left:10px;
+        right:10px;
+        top:auto;
+        bottom:calc(226px + env(safe-area-inset-bottom));
+        width:auto;
+      }
+    }
+
+    @media (max-width:560px){
+      h1{
+        font-size:15px;
+        white-space:normal;
+        display:-webkit-box;
+        -webkit-line-clamp:1;
+        -webkit-box-orient:vertical;
+      }
+
+      .sub{
+        font-size:11px;
+      }
+
+      .app-icon{
+        width:40px;
+        height:40px;
+        border-radius:14px;
+      }
+
+      .controls{
+        gap:7px;
+        padding:8px;
+        border-radius:18px;
+      }
+
+      .control-group{
+        width:100%;
+        justify-content:space-between;
+      }
+
+      input[type="range"]{
+        width:150px;
+      }
+
+      select{
+        width:100%;
+      }
+
+      button{
+        min-height:40px;
+      }
+
+      .planet-name{
+        font-size:16px;
+      }
+
+      .planet-dot{
+        width:34px;
+        height:34px;
+      }
+
+      .metric strong{
+        font-size:12px;
+      }
+
+      .hint{
+        display:none;
+      }
+    }
+
+    @media (orientation:landscape) and (max-height:520px){
+      header{
+        min-height:58px;
+        padding-top:7px;
+        padding-bottom:7px;
+      }
+
+      .app-icon{
+        width:36px;
+        height:36px;
+      }
+
+      .top-panel{
+        top:8px;
+      }
+
+      .controls{
+        max-height:120px;
+        padding:7px;
+      }
+
+      .planet-card{
+        right:8px;
+        left:auto;
+        bottom:8px;
+        width:330px;
+        max-height:calc(100% - 92px);
+        overflow:auto;
+      }
+
+      .install-banner{
+        bottom:8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand-title">
+      <div class="app-icon" aria-hidden="true"></div>
+      <div class="title-wrap">
+        <h1>Sistema Solar PRO</h1>
+        <div class="sub">Simulación educativa, instalable y optimizada para iPhone y Android.</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnInstallHeader" class="brand small" type="button" hidden>Instalar app</button>
+      <button id="btnFullscreenHeader" class="ghost small" type="button">Pantalla completa</button>
+    </div>
+  </header>
+
+  <main class="workspace" id="app">
+    <canvas id="sky" aria-label="Simulación visual del Sistema Solar"></canvas>
+
+    <section class="top-panel" aria-label="Controles de simulación">
+      <div class="controls">
+        <button id="btnPlay" class="brand" type="button">⏸ Pausa</button>
+        <button id="btnReset" class="ghost" type="button">Reiniciar</button>
+
+        <div class="control-group">
+          <label class="control-label" for="timeScale">Tiempo</label>
+          <input id="timeScale" type="range" min="0.00003" max="10" step="0.00003" value="0.00317">
+          <span id="lblScale" class="pill">≈ 1 día/s</span>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="zoomScale">Zoom</label>
+          <input id="zoomScale" type="range" min="0.65" max="2.2" step="0.01" value="1">
+          <span id="lblZoom" class="pill">100%</span>
+        </div>
+
+        <label class="toggle">
+          <input id="chkLabels" type="checkbox" checked>
+          Etiquetas
+        </label>
+
+        <label class="toggle">
+          <input id="chkTrails" type="checkbox" checked>
+          Trazas
+        </label>
+
+        <label class="toggle">
+          <input id="chkOrbits" type="checkbox" checked>
+          Órbitas
+        </label>
+
+        <div class="control-group">
+          <label class="control-label" for="centerSel">Centrar</label>
+          <select id="centerSel">
+            <option value="sun">Sol</option>
+            <option value="mercury">Mercurio</option>
+            <option value="venus">Venus</option>
+            <option value="earth" selected>Tierra</option>
+            <option value="mars">Marte</option>
+            <option value="jupiter">Júpiter</option>
+            <option value="saturn">Saturno</option>
+            <option value="uranus">Urano</option>
+            <option value="neptune">Neptuno</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="speedPreset">Preset</label>
+          <select id="speedPreset">
+            <option value="0.00003">≈ 16 min/s</option>
+            <option value="0.002738">≈ 1 día/s</option>
+            <option value="0.019164">≈ 1 semana/s</option>
+            <option value="0.083333">≈ 1 mes/s</option>
+            <option value="1">≈ 1 año/s</option>
+            <option value="5">≈ 5 años/s</option>
+            <option value="10">≈ 10 años/s</option>
+          </select>
+        </div>
+
+        <button id="btnCapture" class="ghost desktop-only" type="button">Guardar imagen</button>
+        <button id="btnFullscreen" class="ghost mobile-only" type="button">Pantalla completa</button>
+        <button id="btnInstall" class="warning mobile-only" type="button" hidden>Instalar</button>
+      </div>
+    </section>
+
+    <section id="installBanner" class="install-banner" aria-live="polite">
+      <h2 id="installTitle">Instalar Sistema Solar PRO</h2>
+      <p id="installText">Puedes agregar esta herramienta a la pantalla de inicio para usarla como app.</p>
+      <div class="install-actions">
+        <button id="btnInstallBanner" class="brand small" type="button">Instalar</button>
+        <button id="btnCloseInstall" class="ghost small" type="button">Cerrar</button>
+      </div>
+    </section>
+
+    <aside class="planet-card" aria-live="polite">
+      <header>
+        <div>
+          <h2 id="planetTitle" class="planet-name">Tierra</h2>
+          <div id="planetDesc" class="planet-desc">Planeta seleccionado</div>
+        </div>
+        <div id="planetDot" class="planet-dot" aria-hidden="true"></div>
+      </header>
+
+      <div class="data-grid">
+        <div class="metric">
+          <span>Periodo sidéreo</span>
+          <strong id="pPeriod">365.256 días</strong>
+        </div>
+        <div class="metric">
+          <span>Velocidad orbital</span>
+          <strong id="pSpeed">29.78 km/s</strong>
+        </div>
+        <div class="metric">
+          <span>Distancia media</span>
+          <strong id="pA">1.000 UA</strong>
+        </div>
+        <div class="metric">
+          <span>Tiempo simulado</span>
+          <strong id="simClock">0 a 0 d</strong>
+        </div>
+      </div>
+
+      <div class="hint">
+        Toca o haz clic sobre un planeta para ver sus datos. Usa zoom y centrado para navegar mejor en celular.
+      </div>
+    </aside>
+
+    <div class="bottom-note">
+      Distancias comprimidas de forma no lineal para visualización. Los periodos y velocidades son valores medios.
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script>
+    const PLANETS = [
+      {
+        key:"mercury",
+        name:"Mercurio",
+        color:"#b3b3b3",
+        periodDays:87.969,
+        speedKmS:47.36,
+        aAU:0.387,
+        rPx:3.8,
+        desc:"El planeta más cercano al Sol."
+      },
+      {
+        key:"venus",
+        name:"Venus",
+        color:"#c9a46b",
+        periodDays:224.701,
+        speedKmS:35.02,
+        aAU:0.723,
+        rPx:5.3,
+        desc:"Similar en tamaño a la Tierra, con atmósfera muy densa."
+      },
+      {
+        key:"earth",
+        name:"Tierra",
+        color:"#4ea8de",
+        periodDays:365.256,
+        speedKmS:29.78,
+        aAU:1.000,
+        rPx:5.8,
+        desc:"Nuestro planeta, ubicado a una unidad astronómica del Sol."
+      },
+      {
+        key:"mars",
+        name:"Marte",
+        color:"#e76f51",
+        periodDays:686.980,
+        speedKmS:24.08,
+        aAU:1.524,
+        rPx:4.7,
+        desc:"Conocido como el planeta rojo."
+      },
+      {
+        key:"jupiter",
+        name:"Júpiter",
+        color:"#d1bfa3",
+        periodDays:4332.589,
+        speedKmS:13.07,
+        aAU:5.203,
+        rPx:9.2,
+        desc:"El planeta más grande del Sistema Solar."
+      },
+      {
+        key:"saturn",
+        name:"Saturno",
+        color:"#e8d5b5",
+        periodDays:10759.22,
+        speedKmS:9.69,
+        aAU:9.537,
+        rPx:8.2,
+        desc:"Famoso por su sistema de anillos."
+      },
+      {
+        key:"uranus",
+        name:"Urano",
+        color:"#8ad5e5",
+        periodDays:30685.4,
+        speedKmS:6.81,
+        aAU:19.191,
+        rPx:7,
+        desc:"Gigante helado con inclinación extrema."
+      },
+      {
+        key:"neptune",
+        name:"Neptuno",
+        color:"#5aa0ff",
+        periodDays:60190,
+        speedKmS:5.43,
+        aAU:30.07,
+        rPx:7,
+        desc:"El planeta más lejano del Sistema Solar."
+      }
+    ];
+
+    const canvas = document.getElementById("sky");
+    const ctx = canvas.getContext("2d", { alpha:false });
+
+    const app = document.getElementById("app");
+    const btnPlay = document.getElementById("btnPlay");
+    const btnReset = document.getElementById("btnReset");
+    const btnCapture = document.getElementById("btnCapture");
+    const btnFullscreen = document.getElementById("btnFullscreen");
+    const btnFullscreenHeader = document.getElementById("btnFullscreenHeader");
+    const timeScaleInput = document.getElementById("timeScale");
+    const zoomScaleInput = document.getElementById("zoomScale");
+    const lblScale = document.getElementById("lblScale");
+    const lblZoom = document.getElementById("lblZoom");
+    const chkLabels = document.getElementById("chkLabels");
+    const chkTrails = document.getElementById("chkTrails");
+    const chkOrbits = document.getElementById("chkOrbits");
+    const centerSel = document.getElementById("centerSel");
+    const speedPreset = document.getElementById("speedPreset");
+
+    const planetTitle = document.getElementById("planetTitle");
+    const planetDesc = document.getElementById("planetDesc");
+    const planetDot = document.getElementById("planetDot");
+    const pPeriod = document.getElementById("pPeriod");
+    const pSpeed = document.getElementById("pSpeed");
+    const pA = document.getElementById("pA");
+    const simClock = document.getElementById("simClock");
+    const toast = document.getElementById("toast");
+
+    const btnInstall = document.getElementById("btnInstall");
+    const btnInstallHeader = document.getElementById("btnInstallHeader");
+    const btnInstallBanner = document.getElementById("btnInstallBanner");
+    const btnCloseInstall = document.getElementById("btnCloseInstall");
+    const installBanner = document.getElementById("installBanner");
+    const installTitle = document.getElementById("installTitle");
+    const installText = document.getElementById("installText");
+
+    const TWO_PI = Math.PI * 2;
+    const gamma = 0.55;
+    const maxAU = 30.07;
+
+    let w = 0;
+    let h = 0;
+    let dpr = 1;
+    let running = true;
+    let trails = true;
+    let showLabels = true;
+    let showOrbits = true;
+    let centerMode = "earth";
+    let selectedKey = "earth";
+    let yearsPerSecond = parseFloat(timeScaleInput.value);
+    let zoom = parseFloat(zoomScaleInput.value);
+    let simDays = 0;
+    let last = performance.now();
+    let deferredInstallPrompt = null;
+    let toastTimer = null;
+
+    const angles = {};
+    PLANETS.forEach((planet, index) => {
+      angles[planet.key] = Math.random() * TWO_PI + index * 0.33;
+    });
+
+    const stars = Array.from({ length: 420 }, () => ({
+      x:Math.random(),
+      y:Math.random(),
+      a:0.35 + Math.random() * 0.65,
+      r:0.35 + Math.random() * 1.35,
+      tw:Math.random() * TWO_PI
+    }));
+
+    function showToast(message){
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2400);
+    }
+
+    function isStandalone(){
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function isIOS(){
+      return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    }
+
+    function resizeNow(){
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      w = Math.max(1, rect.width);
+      h = Math.max(1, rect.height);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      clearBack(true);
+    }
+
+    function drawStars(){
+      const grd = ctx.createRadialGradient(w * .5, -120, 20, w * .5, h * .45, Math.max(w, h));
+      grd.addColorStop(0, "#0f172a");
+      grd.addColorStop(.55, "#07101f");
+      grd.addColorStop(1, "#030712");
+
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      for(const star of stars){
+        const pulse = 0.72 + Math.sin(performance.now() / 900 + star.tw) * 0.28;
+        ctx.globalAlpha = star.a * pulse;
+        ctx.fillStyle = "#cbd5e1";
+        ctx.beginPath();
+        ctx.arc(star.x * w, star.y * h, star.r, 0, TWO_PI);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function clearBack(full = false){
+      if(full || !trails){
+        drawStars();
+      }else{
+        ctx.fillStyle = "rgba(7, 11, 20, 0.23)";
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+
+    function auToPx(au){
+      const minSide = Math.min(w, h);
+      const baseRadius = minSide * 0.42 * zoom;
+      const k = baseRadius / Math.pow(maxAU, gamma);
+      return k * Math.pow(au, gamma);
+    }
+
+    function getViewOffset(){
+      if(centerMode === "sun"){
+        return { x:0, y:0 };
+      }
+
+      const centerPlanet = PLANETS.find(planet => planet.key === centerMode);
+      if(!centerPlanet){
+        return { x:0, y:0 };
+      }
+
+      const aPx = auToPx(centerPlanet.aAU);
+      const theta = angles[centerPlanet.key];
+
+      return {
+        x:Math.cos(theta) * aPx,
+        y:Math.sin(theta) * aPx
+      };
+    }
+
+    function currentPositions(){
+      const cx = w / 2;
+      const cy = h / 2;
+      const offset = getViewOffset();
+
+      return PLANETS.map(planet => {
+        const aPx = auToPx(planet.aAU);
+        const theta = angles[planet.key];
+        const sx = cx + Math.cos(theta) * aPx - offset.x;
+        const sy = cy + Math.sin(theta) * aPx - offset.y;
+
+        return {
+          ...planet,
+          sx,
+          sy,
+          aPx,
+          theta
+        };
+      });
+    }
+
+    function sunPosition(){
+      const cx = w / 2;
+      const cy = h / 2;
+      const offset = getViewOffset();
+
+      return {
+        x:cx - offset.x,
+        y:cy - offset.y
+      };
+    }
+
+    function formatNumber(value, digits = 2){
+      return value.toLocaleString("es-MX", {
+        maximumFractionDigits:digits
+      });
+    }
+
+    function updateScaleLabel(){
+      const daysPerSecond = yearsPerSecond * 365.25;
+      let text;
+
+      if(daysPerSecond >= 365.25){
+        text = formatNumber(daysPerSecond / 365.25, 2) + " años/s";
+      }else if(daysPerSecond >= 30.4375){
+        text = formatNumber(daysPerSecond / 30.4375, 2) + " meses/s";
+      }else if(daysPerSecond >= 7){
+        text = formatNumber(daysPerSecond / 7, 2) + " semanas/s";
+      }else if(daysPerSecond >= 1){
+        text = formatNumber(daysPerSecond, 2) + " días/s";
+      }else if(daysPerSecond >= 1 / 24){
+        text = formatNumber(daysPerSecond * 24, 1) + " h/s";
+      }else{
+        text = formatNumber(daysPerSecond * 24 * 60, 0) + " min/s";
+      }
+
+      lblScale.textContent = "≈ " + text;
+    }
+
+    function updateZoomLabel(){
+      lblZoom.textContent = Math.round(zoom * 100) + "%";
+    }
+
+    function setInfo(key){
+      const planet = PLANETS.find(item => item.key === key) || PLANETS.find(item => item.key === "earth");
+
+      selectedKey = planet.key;
+      planetTitle.textContent = planet.name;
+      planetDesc.textContent = planet.desc;
+      planetDot.style.background = planet.color;
+      planetDot.style.color = planet.color;
+      pPeriod.textContent = formatNumber(planet.periodDays, 3) + " días";
+      pSpeed.textContent = planet.speedKmS.toFixed(2) + " km/s";
+      pA.textContent = planet.aAU.toFixed(3) + " UA";
+      centerSel.value = centerMode;
+    }
+
+    function hitTest(x, y){
+      const positions = currentPositions();
+
+      for(let i = positions.length - 1; i >= 0; i--){
+        const planet = positions[i];
+        const dx = x - planet.sx;
+        const dy = y - planet.sy;
+        const hitRadius = Math.max(14, planet.rPx + 9);
+
+        if(dx * dx + dy * dy <= hitRadius * hitRadius){
+          return planet;
+        }
+      }
+
+      return null;
+    }
+
+    function drawOrbits(sun){
+      if(!showOrbits){
+        return;
+      }
+
+      ctx.save();
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1;
+
+      for(const planet of PLANETS){
+        const radius = auToPx(planet.aAU);
+        ctx.globalAlpha = planet.key === selectedKey ? .9 : .38;
+        ctx.beginPath();
+        ctx.arc(sun.x, sun.y, radius, 0, TWO_PI);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawSun(sun){
+      ctx.save();
+
+      const glow = ctx.createRadialGradient(sun.x, sun.y, 1, sun.x, sun.y, 44);
+      glow.addColorStop(0, "rgba(251,191,36,1)");
+      glow.addColorStop(.27, "rgba(245,158,11,.8)");
+      glow.addColorStop(.62, "rgba(245,158,11,.18)");
+      glow.addColorStop(1, "rgba(245,158,11,0)");
+
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, 44, 0, TWO_PI);
+      ctx.fill();
+
+      ctx.fillStyle = "#f59e0b";
+      ctx.shadowColor = "#f59e0b";
+      ctx.shadowBlur = 24;
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, 10, 0, TWO_PI);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawPlanet(planet){
+      if(trails){
+        ctx.save();
+        ctx.globalAlpha = planet.key === selectedKey ? .23 : .12;
+        ctx.fillStyle = planet.color;
+        ctx.beginPath();
+        ctx.arc(planet.sx, planet.sy, Math.max(3, planet.rPx + 5), 0, TWO_PI);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+
+      ctx.shadowColor = planet.color;
+      ctx.shadowBlur = planet.key === selectedKey ? 18 : 8;
+      ctx.fillStyle = planet.color;
+      ctx.beginPath();
+      ctx.arc(planet.sx, planet.sy, planet.rPx, 0, TWO_PI);
+      ctx.fill();
+
+      if(planet.key === "saturn"){
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(232,213,181,.75)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(planet.sx, planet.sy, planet.rPx + 7, planet.rPx + 2, 0.35, 0, TWO_PI);
+        ctx.stroke();
+      }
+
+      if(planet.key === selectedKey){
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(255,255,255,.86)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(planet.sx, planet.sy, planet.rPx + 7, 0, TWO_PI);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      if(showLabels){
+        ctx.save();
+        ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(2,6,23,.85)";
+        ctx.fillStyle = planet.key === selectedKey ? "#ffffff" : "#cbd5e1";
+        ctx.strokeText(planet.name, planet.sx + planet.rPx + 7, planet.sy);
+        ctx.fillText(planet.name, planet.sx + planet.rPx + 7, planet.sy);
+        ctx.restore();
+      }
+    }
+
+    function drawCenterMarker(){
+      if(centerMode === "sun"){
+        return;
+      }
+
+      const centerPlanet = PLANETS.find(planet => planet.key === centerMode);
+      if(!centerPlanet){
+        return;
+      }
+
+      ctx.save();
+      ctx.fillStyle = "rgba(56,189,248,.10)";
+      ctx.strokeStyle = "rgba(56,189,248,.65)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2, 18, 0, TWO_PI);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#bae6fd";
+      ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Centro: " + centerPlanet.name, w / 2, h / 2 + 32);
+      ctx.restore();
+    }
+
+    function updateClock(){
+      const yearsTotal = simDays / 365.25;
+      const years = Math.floor(yearsTotal);
+      const days = Math.floor(simDays % 365.25);
+      simClock.textContent = years + " a " + days + " d";
+    }
+
+    function resetSimulation(){
+      simDays = 0;
+      PLANETS.forEach((planet, index) => {
+        angles[planet.key] = index * 0.72;
+      });
+      clearBack(true);
+      updateClock();
+      showToast("Simulación reiniciada");
+    }
+
+    function updateSimulation(dt){
+      if(!running){
+        return;
+      }
+
+      const years = yearsPerSecond * dt;
+      simDays += years * 365.25;
+
+      PLANETS.forEach(planet => {
+        const periodYears = planet.periodDays / 365.25;
+        const delta = TWO_PI * (years / periodYears);
+        angles[planet.key] = (angles[planet.key] + delta) % TWO_PI;
+      });
+    }
+
+    function frame(now){
+      const dt = Math.min((now - last) / 1000, 0.08);
+      last = now;
+
+      updateSimulation(dt);
+      clearBack();
+
+      const sun = sunPosition();
+      const positions = currentPositions();
+
+      drawOrbits(sun);
+      drawSun(sun);
+
+      for(const planet of positions){
+        drawPlanet(planet);
+      }
+
+      drawCenterMarker();
+      updateClock();
+
+      requestAnimationFrame(frame);
+    }
+
+    function captureImage(){
+      try{
+        const link = document.createElement("a");
+        link.download = "sistema-solar-pro.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("Imagen guardada");
+      }catch(error){
+        showToast("No se pudo guardar la imagen en este navegador");
+      }
+    }
+
+    async function toggleFullScreen(){
+      try{
+        if(!document.fullscreenElement){
+          await document.documentElement.requestFullscreen();
+          showToast("Pantalla completa activada");
+        }else{
+          await document.exitFullscreen();
+          showToast("Pantalla completa desactivada");
+        }
+      }catch(error){
+        showToast("Pantalla completa no disponible en este navegador");
+      }
+    }
+
+    function showIOSInstallHelp(){
+      if(isStandalone()){
+        return;
+      }
+
+      installTitle.textContent = "Agregar en iPhone";
+      installText.textContent = "En Safari toca Compartir y después Agregar a pantalla de inicio.";
+      btnInstallBanner.hidden = true;
+      installBanner.classList.add("show");
+    }
+
+    async function installApp(){
+      if(!deferredInstallPrompt){
+        if(isIOS()){
+          showIOSInstallHelp();
+        }else{
+          showToast("Si no aparece instalar, abre la app en Chrome y revisa que esté publicada en HTTPS");
+        }
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+
+      if(choice.outcome === "accepted"){
+        showToast("App instalada");
+      }else{
+        showToast("Instalación cancelada");
+      }
+
+      deferredInstallPrompt = null;
+      btnInstall.hidden = true;
+      btnInstallHeader.hidden = true;
+      installBanner.classList.remove("show");
+    }
+
+    function updateInstallUI(){
+      if(isStandalone()){
+        btnInstall.hidden = true;
+        btnInstallHeader.hidden = true;
+        installBanner.classList.remove("show");
+        return;
+      }
+
+      if(deferredInstallPrompt){
+        btnInstall.hidden = false;
+        btnInstallHeader.hidden = false;
+        installTitle.textContent = "Instalar Sistema Solar PRO";
+        installText.textContent = "Instala la herramienta en tu pantalla de inicio para usarla como app.";
+        btnInstallBanner.hidden = false;
+        installBanner.classList.add("show");
+      }else if(isIOS()){
+        btnInstall.hidden = false;
+        btnInstall.textContent = "Agregar";
+      }
+    }
+
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      updateInstallUI();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      updateInstallUI();
+      showToast("Sistema Solar PRO instalado");
+    });
+
+    canvas.addEventListener("click", event => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const hit = hitTest(x, y);
+
+      if(hit){
+        setInfo(hit.key);
+        selectedKey = hit.key;
+        showToast("Seleccionado: " + hit.name);
+      }
+    }, { passive:true });
+
+    canvas.addEventListener("touchstart", event => {
+      if(!event.touches || event.touches.length !== 1){
+        return;
+      }
+
+      const touch = event.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      const hit = hitTest(x, y);
+
+      if(hit){
+        setInfo(hit.key);
+        selectedKey = hit.key;
+      }
+    }, { passive:true });
+
+    btnPlay.addEventListener("click", () => {
+      running = !running;
+      btnPlay.textContent = running ? "⏸ Pausa" : "▶ Reanudar";
+    });
+
+    btnReset.addEventListener("click", resetSimulation);
+
+    timeScaleInput.addEventListener("input", event => {
+      yearsPerSecond = parseFloat(event.target.value);
+      updateScaleLabel();
+    });
+
+    speedPreset.addEventListener("change", event => {
+      yearsPerSecond = parseFloat(event.target.value);
+      timeScaleInput.value = String(yearsPerSecond);
+      updateScaleLabel();
+      showToast("Velocidad actualizada");
+    });
+
+    zoomScaleInput.addEventListener("input", event => {
+      zoom = parseFloat(event.target.value);
+      updateZoomLabel();
+      clearBack(true);
+    });
+
+    chkLabels.addEventListener("change", () => {
+      showLabels = chkLabels.checked;
+    });
+
+    chkTrails.addEventListener("change", () => {
+      trails = chkTrails.checked;
+      clearBack(true);
+    });
+
+    chkOrbits.addEventListener("change", () => {
+      showOrbits = chkOrbits.checked;
+      clearBack(true);
+    });
+
+    centerSel.addEventListener("change", () => {
+      centerMode = centerSel.value;
+      clearBack(true);
+
+      const centerPlanet = centerMode === "sun"
+        ? { name:"Sol" }
+        : PLANETS.find(planet => planet.key === centerMode);
+
+      if(centerPlanet){
+        showToast("Centro: " + centerPlanet.name);
+      }
+    });
+
+    btnCapture.addEventListener("click", captureImage);
+    btnFullscreen.addEventListener("click", toggleFullScreen);
+    btnFullscreenHeader.addEventListener("click", toggleFullScreen);
+    btnInstall.addEventListener("click", installApp);
+    btnInstallHeader.addEventListener("click", installApp);
+    btnInstallBanner.addEventListener("click", installApp);
+
+    btnCloseInstall.addEventListener("click", () => {
+      installBanner.classList.remove("show");
+    });
+
+    window.addEventListener("resize", resizeNow, { passive:true });
+    window.addEventListener("orientationchange", () => {
+      setTimeout(resizeNow, 250);
+    }, { passive:true });
+
+    document.addEventListener("visibilitychange", () => {
+      last = performance.now();
+    });
+
+    async function registerServiceWorker(){
+      if(!("serviceWorker" in navigator)){
+        return;
+      }
+
+      try{
+        await navigator.serviceWorker.register("sw.js");
+      }catch(error){
+        console.warn("Service Worker no registrado:", error);
+      }
+    }
+
+    function init(){
+      setInfo("earth");
+      updateScaleLabel();
+      updateZoomLabel();
+      resizeNow();
+      registerServiceWorker();
+
+      if(isIOS() && !isStandalone()){
+        setTimeout(showIOSInstallHelp, 1200);
+      }
+
+      updateInstallUI();
+      requestAnimationFrame(frame);
+    }
+
+    init();
+  </script>
+</body>
+</html>
